@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,6 +18,8 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	private static EnumMeepEvent currentEvent;
 	private static EnumMeepEvent lastEvent;
+	private int waitingTaskID = -1;
+	private int runningTaskID = -1;
 	
 	public Random rand = new Random();
 	public HashMap<Integer, Integer> EventRarity = new HashMap<Integer, Integer>();
@@ -43,11 +46,11 @@ public class MeepcraftEvents extends JavaPlugin {
 	}
 	
 	private long getRandomDelay() {
-		return (long)((rand.nextInt(30) + 31) * 60 * 20);
+		return (long)((rand.nextInt(31) + 30) * 60 * 20);
 	}
 	
 	private void scheduleRandomDelayForEventStart() {
-		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		waitingTaskID = this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
 				if (currentEvent != EnumMeepEvent.NONE) {
 					endCurrentEvent();
@@ -59,6 +62,7 @@ public class MeepcraftEvents extends JavaPlugin {
 	}
 
 	public void onDisable() {
+		this.getServer().getScheduler().cancelTasks(this);
 		log.info("MeepcraftEvents plugin disabled!");
 	}
 	
@@ -72,7 +76,7 @@ public class MeepcraftEvents extends JavaPlugin {
 			for (EnumMeepEvent eEvent : EnumMeepEvent.values()) {
 				if (eEvent != EnumMeepEvent.NONE) {
 					eEvent.getMeepEvent().setDefaultValuesForEvent(this);
-					setDefault(eEvent.getConfigName() + ".rarity", eEvent.getDefaultRarity());
+					setDefault(eEvent.getName() + ".rarity", eEvent.getDefaultRarity());
 				}
 			}
 		} catch(Exception e1) {
@@ -92,7 +96,7 @@ public class MeepcraftEvents extends JavaPlugin {
 			for (EnumMeepEvent eEvent : EnumMeepEvent.values()) {
 				if (eEvent != EnumMeepEvent.NONE) {
 					eEvent.getMeepEvent().loadConfigValues(config, this);
-					eEvent.getMeepEvent().rarity = config.getInt(eEvent.getConfigName() + ".rarity");
+					eEvent.getMeepEvent().rarity = config.getInt(eEvent.getName() + ".rarity");
 					EventRarity.put(eEvent.getID(), eEvent.getMeepEvent().rarity);
 				}
 			}
@@ -114,17 +118,21 @@ public class MeepcraftEvents extends JavaPlugin {
 			for (int i = 0; i < possibleEvents.size(); i++) {
 				MeepEvent event = possibleEvents.get(i);
 				if (r <= event.rarity) {
-					currentEvent = event.getEnum();
-					currentEvent.getMeepEvent().start(this);
-					this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-						public void run() {
-							endCurrentEvent();
-						}
-					}, currentEvent.getMeepEvent().lengthOfEvent);
+					startNewEvent(event.getEnum());
 					break;
 				}
 			}
 		}
+	}
+	
+	public void startNewEvent(EnumMeepEvent enumEvent) {
+		currentEvent = enumEvent;
+		currentEvent.getMeepEvent().start(this);
+		runningTaskID = this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			public void run() {
+				endCurrentEvent();
+			}
+		}, currentEvent.getMeepEvent().getLengthOfEvent(rand)*60*20);
 	}
 	
 	public void updateCurrentEvent() {
@@ -178,6 +186,45 @@ public class MeepcraftEvents extends JavaPlugin {
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (cmd.getName().equalsIgnoreCase("startevent")) {
+			if (currentEvent != EnumMeepEvent.NONE) {
+				sender.sendMessage(ChatColor.RED + "Error: There is another event already in progress.");
+				return true;
+			} else if (args.length >= 1) {
+				for (MeepEvent event : getAllEvents()) {
+					if (event.getEnum() == EnumMeepEvent.NONE) {
+						continue;
+					}
+					if (args[0].equalsIgnoreCase(event.getEnum().getName())) {
+						this.getServer().getScheduler().cancelTask(waitingTaskID);
+						startNewEvent(event.getEnum());
+						sender.sendMessage("Event started!");
+						return true;
+					}
+				}
+				sender.sendMessage(ChatColor.RED + "Error: Event not found!");
+				return true;
+			}
+			return false;
+		} else if (cmd.getName().equalsIgnoreCase("endevent")) {
+			if (currentEvent == EnumMeepEvent.NONE) {
+				sender.sendMessage("There is no event in progress!");
+				return true;
+			} else {
+				if (args.length >= 1) {
+					if (args[0].equalsIgnoreCase(currentEvent.getName())) {
+						this.getServer().getScheduler().cancelTask(runningTaskID);
+						endCurrentEvent();
+						sender.sendMessage("Event ended.");
+						return true;
+					} else {
+						sender.sendMessage("There is no event by that name in progress.");
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 		for (MeepEvent event : getAllEvents()) {
 			if (event != null) {
 				String[] cmds = event.getCommandNames();

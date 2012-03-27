@@ -1,5 +1,7 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
+import java.util.Random;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -124,6 +126,11 @@ public class EventTradeHour extends MeepEvent {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public long getLengthOfEvent(Random random) {
+		return 60;
 	}
 
 }

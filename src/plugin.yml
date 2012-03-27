@@ -5,6 +5,16 @@ author: AlexDGr8r
 website: http://meepcraft.net/
 version: 1.0
 commands:
+    startevent:
+        description: Start an event
+        usage: /startevent <event>
+        permission: meep.startevent
+        permission-message: You don't have permission to do this.
+    endevent:
+        description: End an event
+        usage: /endevent <event>
+        permission: meep.endevent
+        permission-message: You don't have permission to do this.
     tradehour:
         description: Transports player to Trade Hour Market Location
         usage: /tradehour
@@ -26,9 +36,21 @@ permissions:
         default: op
         children:
             meep.settrade: true
+            meep.startevent: true
+            meep.endevent: true
+            meep.avoidmob: true
     meep.tradehour:
         description: Allows to use tradehour command during Trade Hour
         default: true
     meep.settrade:
         description: Allows to set tradehour location
+        default: op
+    meep.startevent:
+        description: Allows to start an event
+        default: op
+    meep.endevent:
+        description: Allows to ends an event
+        default: op
+    meep.avoidmob:
+        description: Makes mobs not target you during Mob Attack
         default: op

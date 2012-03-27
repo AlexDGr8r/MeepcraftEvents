@@ -3,17 +3,17 @@ package net.meepcraft.alexdgr8r.meepcraftevents;
 public enum EnumMeepEvent {
 	
 	NONE(0, "none", -1, null),
-	TRADE_HOUR(1, "tradehour", 15, new EventTradeHour()),
+	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
 	MOB_ATTACK(2, "mobattack", 5, new EventMobAttack());
 	
 	private int ID;
-	private String ConfigName;
+	private String Name;
 	private int DefaultRarity;
 	private MeepEvent meepEvent;
 	
-	EnumMeepEvent(int id, String configName, int defRarity, MeepEvent event) {
+	EnumMeepEvent(int id, String name, int defRarity, MeepEvent event) {
 		ID = id;
-		ConfigName = configName;
+		Name = name;
 		DefaultRarity = defRarity;
 		meepEvent = event;
 	}
@@ -22,8 +22,8 @@ public enum EnumMeepEvent {
 		return ID;
 	}
 	
-	public String getConfigName() {
-		return ConfigName;
+	public String getName() {
+		return Name;
 	}
 	
 	public int getDefaultRarity() {

@@ -1,5 +1,7 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
+import java.util.Random;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -7,7 +9,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 public abstract class MeepEvent implements Comparable<MeepEvent> {
 	
 	public int rarity;
-	public long lengthOfEvent;
 
 	/** Called at start of event. */
 	public void start(MeepcraftEvents plugin) {}
@@ -40,6 +41,10 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 	/** Must give a new instance of event in order to reset values after event ends. */
 	public abstract MeepEvent getNewInstance();
 	
+	/** Must give Enum for Event */
 	public abstract EnumMeepEvent getEnum();
+	
+	/** Must give how long event lasts in Minutes */
+	public abstract long getLengthOfEvent(Random random); 
 
 }
