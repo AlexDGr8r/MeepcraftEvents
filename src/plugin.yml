@@ -1,5 +1,8 @@
 name: MeepcraftEvents
 main: net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents
+description: Gives Meepcraft some cool random events and stuff
+author: AlexDGr8r
+website: http://meepcraft.net/
 version: 1.0
 commands:
     tradehour:
@@ -12,3 +15,20 @@ commands:
         usage: /settrade
         permission: meep.settrade
         permission-message: You don't have permission to do this.
+permissions:
+    meep.standard:
+        description: Standard permissions for players
+        default: true
+        children:
+            meep.tradehour: true
+    meep.admin:
+        description: Admin permissions set
+        default: op
+        children:
+            meep.settrade: true
+    meep.tradehour:
+        description: Allows to use tradehour command during Trade Hour
+        default: true
+    meep.settrade:
+        description: Allows to set tradehour location
+        default: op

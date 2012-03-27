@@ -1,7 +1,5 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
-import java.io.IOException;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,17 +7,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class EventTradeHour extends MeepEvent {
 	
 	public Location MarketLocation;
 	public String Message;
+	public boolean isTradeHour = false;
 	
 	private int updateTicks = 0;
 
 	@Override
 	public void start(MeepcraftEvents plugin) {
+		isTradeHour = true;
 		plugin.getServer().broadcast(Message, "meep.tradehour");
 	}
 
@@ -34,7 +33,8 @@ public class EventTradeHour extends MeepEvent {
 
 	@Override
 	public void end(MeepcraftEvents plugin) {
-		
+		isTradeHour = false;
+		plugin.getServer().broadcast(ChatColor.DARK_GREEN + "I'm sorry, but Trade Hour is now over. :( Please leave by either doing /back or /spawn", "meep.tradehour");
 	}
 	
 	@Override
@@ -97,12 +97,18 @@ public class EventTradeHour extends MeepEvent {
 		if (cmd.getName().equalsIgnoreCase("settrade")) {
 			MarketLocation = player.getLocation();
 			saveMarketLocation(MeepcraftEvents.config);
-			player.sendMessage(ChatColor.DARK_GREEN + "Trade Hour Location set.");
+			player.sendMessage(ChatColor.DARK_GREEN + "Trade Hour Location set. You can test using /tradehour");
 			return true;
 		} else if (cmd.getName().equalsIgnoreCase("tradehour")) {
-			
+			if (isTradeHour || player.hasPermission("meep.settrade")) {
+				if (player.teleport(MarketLocation)) {
+					player.sendMessage(ChatColor.GREEN + "Welcome to the Trade Hour Market!");
+				}
+			} else {
+				player.sendMessage(ChatColor.RED + "It is not currently Trade Hour.");
+			}
+			return true;
 		}
-		
 		return false;
 	}
 	
