@@ -1,0 +1,14 @@
+name: MeepcraftEvents
+main: net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents
+version: 1.0
+commands:
+    tradehour:
+        description: Transports player to Trade Hour Market Location
+        usage: /tradehour
+        permission: meep.tradehour
+        permission-message: You don't have permission to do this.
+    settrade:
+        description: Sets Location of Trade Hour Market
+        usage: /settrade
+        permission: meep.settrade
+        permission-message: You don't have permission to do this.
