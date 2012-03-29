@@ -34,6 +34,7 @@ public class MeepcraftEvents extends JavaPlugin {
 		LoadConfigValues();
 		currentEvent = EnumMeepEvent.NONE;
 		lastEvent = EnumMeepEvent.NONE;
+		this.getServer().getPluginManager().registerEvents(new MeepListeners(), this);
 		scheduleRandomDelayForEventStart();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
@@ -46,7 +47,7 @@ public class MeepcraftEvents extends JavaPlugin {
 	}
 	
 	private long getRandomDelay() {
-		return (long)((rand.nextInt(31) + 30) * 60 * 20);
+		return (long)((rand.nextInt(120) + 30) * 60 * 20);
 	}
 	
 	private void scheduleRandomDelayForEventStart() {
@@ -117,7 +118,7 @@ public class MeepcraftEvents extends JavaPlugin {
 			int r = rand.nextInt(101);
 			for (int i = 0; i < possibleEvents.size(); i++) {
 				MeepEvent event = possibleEvents.get(i);
-				if (r <= event.rarity) {
+				if (r <= event.rarity && rand.nextInt(10) < 7) {
 					startNewEvent(event.getEnum());
 					break;
 				}

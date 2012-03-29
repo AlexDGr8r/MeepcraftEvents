@@ -5,15 +5,18 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 public class EventTradeHour extends MeepEvent {
 	
 	public Location MarketLocation;
 	public String Message;
+	public String endMessage;
 	public boolean isTradeHour = false;
 	
 	private int updateTicks = 0;
@@ -36,24 +39,34 @@ public class EventTradeHour extends MeepEvent {
 	@Override
 	public void end(MeepcraftEvents plugin) {
 		isTradeHour = false;
-		plugin.getServer().broadcast(ChatColor.DARK_GREEN + "I'm sorry, but Trade Hour is now over. :( Please leave by either doing /back or /spawn", "meep.tradehour");
+		plugin.getServer().broadcast(endMessage, "meep.tradehour");
+	}
+	
+	public void playerLogin(PlayerLoginEvent event) {
+		Player player = event.getPlayer();
+		if (player.hasPermission("meep.tradehour")) {
+			player.sendMessage(Message);
+		}
 	}
 	
 	@Override
 	public void setDefaultValuesForEvent(MeepcraftEvents plugin) {
 		for (World world : plugin.getServer().getWorlds()) {
 			if (world != null) {
-				Location loc = world.getSpawnLocation();
-				plugin.setDefault("tradehour.location.x", loc.getX());
-				plugin.setDefault("tradehour.location.y", loc.getY());
-				plugin.setDefault("tradehour.location.z", loc.getZ());
-				plugin.setDefault("tradehour.location.world", loc.getWorld().getName());
-				plugin.setDefault("tradehour.location.yaw", String.valueOf(loc.getYaw()));
-				plugin.setDefault("tradehour.location.pitch", String.valueOf(loc.getPitch()));
-				break;
+				if (world.getEnvironment() == Environment.NORMAL) {
+					Location loc = world.getSpawnLocation();
+					plugin.setDefault("tradehour.location.x", loc.getX());
+					plugin.setDefault("tradehour.location.y", loc.getY());
+					plugin.setDefault("tradehour.location.z", loc.getZ());
+					plugin.setDefault("tradehour.location.world", loc.getWorld().getName());
+					plugin.setDefault("tradehour.location.yaw", String.valueOf(loc.getYaw()));
+					plugin.setDefault("tradehour.location.pitch", String.valueOf(loc.getPitch()));
+					break;
+				}
 			}
 		}
 		plugin.setDefault("tradehour.message", ChatColor.AQUA.toString() + "It is now Trade Hour! Do /tradehour to make some great deals at the market!");
+		plugin.setDefault("tradehour.EndingMessage", ChatColor.DARK_GREEN.toString() + "I'm sorry, but Trade Hour is now over. :( Please leave by either doing /back or /spawn");
 	}
 	
 	@Override
@@ -69,6 +82,7 @@ public class EventTradeHour extends MeepEvent {
 		pitch = Float.parseFloat(config.getString("tradehour.location.pitch"));
 		MarketLocation = new Location(plugin.getServer().getWorld(worldName), x, y, z, yaw, pitch);
 		Message = config.getString("tradehour.message");
+		endMessage = config.getString("tradehour.EndingMessage");
 	}
 
 	@Override

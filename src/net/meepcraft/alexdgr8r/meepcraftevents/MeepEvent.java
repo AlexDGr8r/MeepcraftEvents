@@ -5,9 +5,11 @@ import java.util.Random;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 public abstract class MeepEvent implements Comparable<MeepEvent> {
 	
+	/** How likely an event is to occur out of 100. Config value handled through main class. */
 	public int rarity;
 
 	/** Called at start of event. */
@@ -25,13 +27,18 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 	/** Load all configuration values. */
 	public void loadConfigValues(FileConfiguration config, MeepcraftEvents plugin) {}
 	
+	/** Return an array of all the command names involved in this event */
 	public String[] getCommandNames() {
 		return null;
 	}
 	
+	/** Handle any commands involed with this event */
 	public boolean handleCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		return false;
 	}
+	
+	/** Called when MeepEvent is current event and when a player logs in. PRIORITY=NORMAL */
+	public void playerLogin(PlayerLoginEvent event) {}
 
 	@Override
 	public final int compareTo(MeepEvent o) {
