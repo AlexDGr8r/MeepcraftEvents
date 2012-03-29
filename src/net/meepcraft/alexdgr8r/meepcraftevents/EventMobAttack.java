@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -21,12 +22,22 @@ public class EventMobAttack extends MeepEvent {
 				spawnMobs(player, plugin);
 			}	
 		}
+		for (World world : plugin.getServer().getWorlds()) {
+			if (world.getTime() <= 16000 || world.getTime() >= 22000) {
+				world.setTime(18000);
+			}
+		}
 	}
 	
 	public void update(MeepcraftEvents plugin) {
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			if (!player.hasPermission("meep.avoidmob")) {
 				spawnMobs(player, plugin);
+			}
+		}
+		for (World world : plugin.getServer().getWorlds()) {
+			if (world.getTime() <= 16000 || world.getTime() >= 22000) {
+				world.setTime(18000);
 			}
 		}
 	}
