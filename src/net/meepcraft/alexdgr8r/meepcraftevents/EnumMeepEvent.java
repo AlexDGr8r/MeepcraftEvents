@@ -4,7 +4,8 @@ public enum EnumMeepEvent {
 	
 	NONE(0, "none", -1, null),
 	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
-	MOB_ATTACK(2, "mobattack", 5, new EventMobAttack());
+	MOB_ATTACK(2, "mobattack", 5, new EventMobAttack()),
+	DOUBLE_EXP(3, "doubleexp", 15, new EventDoubleExp());
 	
 	private int ID;
 	private String Name;

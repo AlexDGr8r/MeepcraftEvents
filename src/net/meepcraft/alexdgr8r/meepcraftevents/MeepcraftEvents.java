@@ -1,6 +1,5 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	public static Logger log;
 	public static FileConfiguration config;
-	public static File configFile = new File("plugins" + File.separator + "MeepcraftEvents" + File.separator + "config.yml");
 
 	public void onEnable() {
 		log = this.getLogger();
@@ -64,40 +62,35 @@ public class MeepcraftEvents extends JavaPlugin {
 
 	public void onDisable() {
 		this.getServer().getScheduler().cancelTasks(this);
+		this.saveConfig();
 		log.info("MeepcraftEvents plugin disabled!");
 	}
 	
 	private void configurationSetup() {
 		try {
 			config = this.getConfig();
-			configFile.mkdir();
-			if (!configFile.exists()) {
-				configFile.createNewFile();
-			}
 			for (EnumMeepEvent eEvent : EnumMeepEvent.values()) {
 				if (eEvent != EnumMeepEvent.NONE) {
 					eEvent.getMeepEvent().setDefaultValuesForEvent(this);
-					setDefault(eEvent.getName() + ".rarity", eEvent.getDefaultRarity());
+					setDefault("rarity." + eEvent.getName(), eEvent.getDefaultRarity());
 				}
 			}
+			this.saveConfig();
 		} catch(Exception e1) {
 			e1.printStackTrace();
 		}
 	}
 	
 	public void setDefault(String path, Object value) {
-		if (!config.contains(path)) {
-			config.set(path, value);
-		}
+		if (!config.isSet(path)) config.set(path, value);
 	}
 	
 	private void LoadConfigValues() {
 		try {
-			config.load(configFile);
 			for (EnumMeepEvent eEvent : EnumMeepEvent.values()) {
 				if (eEvent != EnumMeepEvent.NONE) {
 					eEvent.getMeepEvent().loadConfigValues(config, this);
-					eEvent.getMeepEvent().rarity = config.getInt(eEvent.getName() + ".rarity");
+					eEvent.getMeepEvent().rarity = config.getInt("rarity." + eEvent.getName());
 					EventRarity.put(eEvent.getID(), eEvent.getMeepEvent().rarity);
 				}
 			}
@@ -118,7 +111,7 @@ public class MeepcraftEvents extends JavaPlugin {
 			int r = rand.nextInt(101);
 			for (int i = 0; i < possibleEvents.size(); i++) {
 				MeepEvent event = possibleEvents.get(i);
-				if (r <= event.rarity && rand.nextInt(10) < 7) {
+				if (r <= event.rarity && rand.nextInt(10) < 3) {
 					startNewEvent(event.getEnum());
 					break;
 				}
@@ -212,18 +205,10 @@ public class MeepcraftEvents extends JavaPlugin {
 				sender.sendMessage("There is no event in progress!");
 				return true;
 			} else {
-				if (args.length >= 1) {
-					if (args[0].equalsIgnoreCase(currentEvent.getName())) {
-						this.getServer().getScheduler().cancelTask(runningTaskID);
-						endCurrentEvent();
-						sender.sendMessage("Event ended.");
-						return true;
-					} else {
-						sender.sendMessage("There is no event by that name in progress.");
-						return true;
-					}
-				}
-				return false;
+				this.getServer().getScheduler().cancelTask(runningTaskID);
+				endCurrentEvent();
+				sender.sendMessage("Event ended.");
+				return true;
 			}
 		}
 		for (MeepEvent event : getAllEvents()) {

@@ -5,7 +5,10 @@ import java.util.Random;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public abstract class MeepEvent implements Comparable<MeepEvent> {
 	
@@ -37,10 +40,18 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 		return false;
 	}
 	
-	/** Called when MeepEvent is current event and when a player logs in. PRIORITY=NORMAL */
-	public void playerLogin(PlayerLoginEvent event) {}
+	/** Called when MeepEvent is current event and when a player joins the server. PRIORITY=NORMAL */
+	public void playerJoin(PlayerJoinEvent event) {}
+	
+	/** Called when MeepEvent is current event and when a player quits the server. PRIORITY=NORMAL */
+	public void playerQuit(PlayerQuitEvent event) {}
+	
+	/** Called when MeepEvent is current event and when an entity dies. PRIORITY=NORMAL */
+	public void entityDeath(EntityDeathEvent event) {}
+	
+	/** Called when MeepEvent is current event and when a player is about to receive experience normally. PRIORITY=NORMAL */
+	public void playerExpChange(PlayerExpChangeEvent event) {}
 
-	@Override
 	public final int compareTo(MeepEvent o) {
 		return this.rarity - o.rarity;
 	}

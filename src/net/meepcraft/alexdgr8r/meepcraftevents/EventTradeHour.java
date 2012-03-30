@@ -71,15 +71,12 @@ public class EventTradeHour extends MeepEvent {
 	
 	@Override
 	public void loadConfigValues(FileConfiguration config, MeepcraftEvents plugin) {
-		double x, y, z;
-		String worldName;
-		float yaw, pitch;
-		x = config.getDouble("tradehour.location.x");
-		y = config.getDouble("tradehour.location.y");
-		z = config.getDouble("tradehour.location.z");
-		worldName = config.getString("tradehour.location.world");
-		yaw = Float.parseFloat(config.getString("tradehour.location.yaw"));
-		pitch = Float.parseFloat(config.getString("tradehour.location.pitch"));
+		double x = config.getDouble("tradehour.location.x");
+		double y = config.getDouble("tradehour.location.y");
+		double z = config.getDouble("tradehour.location.z");
+		String worldName = config.getString("tradehour.location.world");
+		float yaw = Float.parseFloat(config.getString("tradehour.location.yaw"));
+		float pitch = Float.parseFloat(config.getString("tradehour.location.pitch"));
 		MarketLocation = new Location(plugin.getServer().getWorld(worldName), x, y, z, yaw, pitch);
 		Message = config.getString("tradehour.message");
 		endMessage = config.getString("tradehour.EndingMessage");
@@ -136,7 +133,6 @@ public class EventTradeHour extends MeepEvent {
 			config.set("tradehour.location.world", MarketLocation.getWorld().getName());
 			config.set("tradehour.location.yaw", String.valueOf(MarketLocation.getYaw()));
 			config.set("tradehour.location.pitch", String.valueOf(MarketLocation.getPitch()));
-			config.save(MeepcraftEvents.configFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

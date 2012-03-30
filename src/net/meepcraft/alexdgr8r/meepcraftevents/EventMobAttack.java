@@ -1,6 +1,11 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -9,27 +14,33 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Tameable;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 public class EventMobAttack extends MeepEvent {
 	
+	public int ticksTillStart = 4;
+	public HashMap<Player, Integer> mobKills = new HashMap<Player, Integer>();
+	
 	public void start(MeepcraftEvents plugin) {
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! The horde arrives!! Hide the women and children!");
-		for (Player player : plugin.getServer().getOnlinePlayers()) {
-			if (!player.hasPermission("meep.avoidmob")) {
-				spawnMobs(player, plugin);
-			}	
-		}
+		plugin.getServer().broadcastMessage(ChatColor.RED + "They'll be here very soon!");
 		for (World world : plugin.getServer().getWorlds()) {
-			if (world.getTime() <= 16000 || world.getTime() >= 22000) {
-				world.setTime(18000);
+			world.setTime(18000);
+			if (world.getEnvironment() == Environment.NORMAL) {
+				world.setStorm(true);
 			}
 		}
 	}
 	
 	public void update(MeepcraftEvents plugin) {
+		if (--ticksTillStart > 0) return;
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			if (!player.hasPermission("meep.avoidmob")) {
 				spawnMobs(player, plugin);
@@ -44,6 +55,19 @@ public class EventMobAttack extends MeepEvent {
 	
 	public void end(MeepcraftEvents plugin) {
 		plugin.getServer().broadcastMessage(ChatColor.AQUA + "The battle is over! Head back to your homes and rest. You deserve it.");
+		plugin.getServer().broadcastMessage(ChatColor.AQUA + "======Top Killers======");
+		List<Player> players = new ArrayList<Player>();
+		for (Entry<Player, Integer> p : mobKills.entrySet()) {
+			players.add(p.getKey());
+		}
+		Collections.sort(players, new Comparator<Player>() {
+			public int compare(Player o1, Player o2) {
+				return mobKills.get(o2) - mobKills.get(o1);
+			}
+		});
+		for (int i = 0; i < (players.size() < 5 ? players.size() : 5); i++) {
+			plugin.getServer().broadcastMessage(ChatColor.AQUA + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.AQUA + " - Kills: " + mobKills.get(players.get(i)));
+		}
 	}
 	
 	public void playerLogin(PlayerLoginEvent event) {
@@ -85,6 +109,7 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 			if (tries <= 10) {
+				MeepcraftEvents.log.info("[MeepcraftEvents] Mob spawned around " + player.getName() + " " + randLoc.distance(loc) + " blocks away.");
 				monstersAround++;
 			}
 			if (++spawnTries >= 5) {
@@ -95,9 +120,12 @@ public class EventMobAttack extends MeepEvent {
 	
 	public Location getRandomLocation(Location loc, Random random) {
 		double x = (double)random.nextInt(15);
-		double y = (double)random.nextInt(15);
+		double y = (double)random.nextInt(8);
 		double z = (double)random.nextInt(15);
-		return new Location(loc.getWorld(), x, y, z);
+		if (random.nextBoolean()) x = -x;
+		if (random.nextBoolean()) y = -y;
+		if (random.nextBoolean()) z = -z;
+		return new Location(loc.getWorld(), loc.getX() + x, loc.getY() + y, loc.getZ() + z);
 	}
 	
 	public EntityType getEntityTypeBasedOnEnv(Environment env, Random random) {
@@ -143,6 +171,36 @@ public class EventMobAttack extends MeepEvent {
 			return EntityType.ENDERMAN;
 		}
 		return EntityType.ZOMBIE;
+	}
+	
+	public void entityDeath(EntityDeathEvent event) {
+		if(!(event.getEntity() instanceof LivingEntity)) return;
+		
+		LivingEntity victim = (LivingEntity)event.getEntity();
+		
+		if (victim.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent e = (EntityDamageByEntityEvent)victim.getLastDamageCause();
+			Player player = null;
+			if (e.getDamager() instanceof Player) {
+				player = (Player)e.getDamager();
+			} else if (e.getDamager() instanceof Projectile && ((Projectile)e.getDamager()).getShooter() instanceof Player) {
+				player = (Player)((Projectile)e.getDamager()).getShooter();
+			} else if (e.getDamager() instanceof Tameable) {
+				Tameable tame = (Tameable)e.getDamager();
+				if (tame.isTamed() && tame.getOwner() instanceof Player) {
+					player = (Player)tame.getOwner();
+				}
+			}
+			if (player != null) {
+				if (!(victim instanceof Player)) {
+					if (!mobKills.containsKey(player)) {
+						mobKills.put(player, 1);
+					} else {
+						mobKills.put(player, mobKills.get(player) + 1);
+					}
+				}
+			}
+		}
 	}
 
 }

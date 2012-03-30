@@ -12,7 +12,7 @@ commands:
         permission-message: You don't have permission to do this.
     endevent:
         description: End an event
-        usage: /endevent <event>
+        usage: /endevent
         permission: meep.endevent
         permission-message: You don't have permission to do this.
     tradehour:
