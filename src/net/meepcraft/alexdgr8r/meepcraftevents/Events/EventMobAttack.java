@@ -1,4 +1,4 @@
-package net.meepcraft.alexdgr8r.meepcraftevents;
+package net.meepcraft.alexdgr8r.meepcraftevents.Events;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+
+import net.meepcraft.alexdgr8r.meepcraftevents.EnumMeepEvent;
+import net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,26 +24,33 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EventMobAttack extends MeepEvent {
 	
-	public int ticksTillStart = 4;
+	public int ticksTillStart = 2;
 	public HashMap<Player, Integer> mobKills = new HashMap<Player, Integer>();
 	
-	public void start(MeepcraftEvents plugin) {
-		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! The horde arrives!! Hide the women and children!");
-		plugin.getServer().broadcastMessage(ChatColor.RED + "They'll be here very soon!");
+	public boolean start(MeepcraftEvents plugin) {
+		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! Her army is arriving!!!");
+		plugin.getServer().broadcastMessage(ChatColor.RED + "They will try and kill each one of you, one by one.");
+		plugin.getServer().broadcastMessage(ChatColor.RED + "Kill as many as you can!");
 		for (World world : plugin.getServer().getWorlds()) {
 			world.setTime(18000);
 			if (world.getEnvironment() == Environment.NORMAL) {
 				world.setStorm(true);
 			}
 		}
+		return true;
 	}
 	
 	public void update(MeepcraftEvents plugin) {
-		if (--ticksTillStart > 0) return;
+		if (--ticksTillStart > 0) {
+			return;
+		}
+		if (ticksTillStart == 0) {
+			plugin.getServer().broadcastMessage(ChatColor.RED + "HERE THEY COME!!!");
+		}
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			if (!player.hasPermission("meep.avoidmob")) {
 				spawnMobs(player, plugin);
@@ -54,8 +64,9 @@ public class EventMobAttack extends MeepEvent {
 	}
 	
 	public void end(MeepcraftEvents plugin) {
-		plugin.getServer().broadcastMessage(ChatColor.AQUA + "The battle is over! Head back to your homes and rest. You deserve it.");
-		plugin.getServer().broadcastMessage(ChatColor.AQUA + "======Top Killers======");
+		plugin.getServer().broadcastMessage(ChatColor.AQUA + "The battle is over! She is retreating!");
+		plugin.getServer().broadcastMessage(ChatColor.AQUA + "I'm sure she'll be back. For now, rest and rebuild.");
+		plugin.getServer().broadcastMessage(ChatColor.AQUA + "======Best Soldiers======");
 		List<Player> players = new ArrayList<Player>();
 		for (Entry<Player, Integer> p : mobKills.entrySet()) {
 			players.add(p.getKey());
@@ -68,10 +79,25 @@ public class EventMobAttack extends MeepEvent {
 		for (int i = 0; i < (players.size() < 5 ? players.size() : 5); i++) {
 			plugin.getServer().broadcastMessage(ChatColor.AQUA + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.AQUA + " - Kills: " + mobKills.get(players.get(i)));
 		}
+		if (MeepcraftEvents.economy != null) {
+			for (int i = 0; i < players.size(); i++) {
+				int amount = 5 * mobKills.get(players.get(i));
+				MeepcraftEvents.economy.depositPlayer(players.get(i).getName(), amount);
+				if (players.get(i).isOnline()) {
+					players.get(i).sendMessage(ChatColor.GOLD + "You just received " + amount + " gold coins for this event!");
+				}
+			}
+		}
+		for (World world : plugin.getServer().getWorlds()) {
+			world.setTime(0);
+			if (world.getEnvironment() == Environment.NORMAL) {
+				world.setStorm(false);
+			}
+		}
 	}
 	
-	public void playerLogin(PlayerLoginEvent event) {
-		event.getPlayer().sendMessage(ChatColor.RED + "Mobs are attacking! Prepare quickly for battle!");
+	public void playerJoin(PlayerJoinEvent event) {
+		event.getPlayer().sendMessage(ChatColor.RED + "SHE's army is attacking! Prepare quickly for battle!");
 	}
 
 	@Override
@@ -86,7 +112,7 @@ public class EventMobAttack extends MeepEvent {
 
 	@Override
 	public long getLengthOfEvent(Random random) {
-		return random.nextInt(31) + 5;
+		return random.nextInt(26) + 5;
 	}
 	
 	public void spawnMobs(Player player, MeepcraftEvents plugin) {

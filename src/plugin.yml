@@ -4,6 +4,7 @@ description: Gives Meepcraft some cool random events and stuff
 author: AlexDGr8r
 website: http://meepcraft.net/
 version: 1.0
+softdepend: [Vault]
 commands:
     startevent:
         description: Start an event

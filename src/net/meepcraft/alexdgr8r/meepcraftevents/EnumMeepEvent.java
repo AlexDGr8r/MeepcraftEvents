@@ -1,5 +1,7 @@
 package net.meepcraft.alexdgr8r.meepcraftevents;
 
+import net.meepcraft.alexdgr8r.meepcraftevents.Events.*;
+
 public enum EnumMeepEvent {
 	
 	NONE(0, "none", -1, null),

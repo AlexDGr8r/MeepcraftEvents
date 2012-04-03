@@ -1,6 +1,9 @@
-package net.meepcraft.alexdgr8r.meepcraftevents;
+package net.meepcraft.alexdgr8r.meepcraftevents.Events;
 
 import java.util.Random;
+
+import net.meepcraft.alexdgr8r.meepcraftevents.EnumMeepEvent;
+import net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,7 +19,7 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 	public int rarity;
 
 	/** Called at start of event. */
-	public void start(MeepcraftEvents plugin) {}
+	public boolean start(MeepcraftEvents plugin) {return true;}
 
 	/** Called every 15 seconds during event. */
 	public void update(MeepcraftEvents plugin) {}

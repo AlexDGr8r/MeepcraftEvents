@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.meepcraft.alexdgr8r.meepcraftevents.Events.MeepEvent;
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MeepcraftEvents extends JavaPlugin {
@@ -25,11 +29,17 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	public static Logger log;
 	public static FileConfiguration config;
+	public static Economy economy = null;
 
 	public void onEnable() {
 		log = this.getLogger();
 		configurationSetup();
 		LoadConfigValues();
+		if (setupEcon()) {
+			log.info("[MeepcraftEvents] Hooked to " + economy.getName() + "!");
+		} else {
+			log.info("[MeepcraftEvents] Did not link with an economy plugin!");
+		}
 		currentEvent = EnumMeepEvent.NONE;
 		lastEvent = EnumMeepEvent.NONE;
 		this.getServer().getPluginManager().registerEvents(new MeepListeners(), this);
@@ -99,6 +109,20 @@ public class MeepcraftEvents extends JavaPlugin {
 		}
 	}
 	
+	private boolean setupEcon() {
+		if (this.getServer().getPluginManager().getPlugin("Vault") == null) {
+			log.info("[MeepcraftEvents] Did not link with Vault plugin!");
+			return false;
+		}
+		RegisteredServiceProvider<Economy> economyProvider = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+		if (economyProvider == null) {
+			log.info("[MeepcraftEvents] Did not link with an economy plugin!");
+			return false;
+		}
+		economy = economyProvider.getProvider();
+		return economy != null;
+	}
+	
 	public void startNewEvent() {
 		if (currentEvent == EnumMeepEvent.NONE) {
 			List<MeepEvent> possibleEvents;
@@ -121,12 +145,15 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	public void startNewEvent(EnumMeepEvent enumEvent) {
 		currentEvent = enumEvent;
-		currentEvent.getMeepEvent().start(this);
-		runningTaskID = this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			public void run() {
-				endCurrentEvent();
-			}
-		}, currentEvent.getMeepEvent().getLengthOfEvent(rand)*60*20);
+		if (currentEvent.getMeepEvent().start(this)) {
+			runningTaskID = this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+				public void run() {
+					endCurrentEvent();
+				}
+			}, currentEvent.getMeepEvent().getLengthOfEvent(rand)*60*20);
+		} else {
+			endCurrentEvent();
+		}
 	}
 	
 	public void updateCurrentEvent() {

@@ -1,4 +1,4 @@
-package net.meepcraft.alexdgr8r.meepcraftevents;
+package net.meepcraft.alexdgr8r.meepcraftevents.Events;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,16 +8,22 @@ import java.util.List;
 import java.util.Random;
 import java.util.Map.Entry;
 
+import net.meepcraft.alexdgr8r.meepcraftevents.EnumMeepEvent;
+import net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EventDoubleExp extends MeepEvent {
 	
 	public HashMap<Player, Integer> expGain = new HashMap<Player, Integer>();
 	
-	public void start(MeepcraftEvents plugin) {
-		plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will now receive Double Experience for the next hour! Enjoy!");
+	public boolean start(MeepcraftEvents plugin) {
+		plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will now receive Double Experience for the next hour!");
+		plugin.getServer().broadcastMessage(ChatColor.GOLD + "Let's see who can get the most experience.");
+		return true;
 	}
 	
 	public void end(MeepcraftEvents plugin) {
@@ -35,6 +41,15 @@ public class EventDoubleExp extends MeepEvent {
 		for (int i = 0; i < (players.size() < 5 ? players.size() : 5); i++) {
 			plugin.getServer().broadcastMessage(ChatColor.GOLD + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.GOLD + " - Exp. Gained: " + expGain.get(players.get(i)));
 		}
+		if (MeepcraftEvents.economy != null) {
+			for (int i = 0; i < players.size(); i++) {
+				int amount = 3 * expGain.get(players.get(i));
+				MeepcraftEvents.economy.depositPlayer(players.get(i).getName(), amount);
+				if (players.get(i).isOnline()) {
+					players.get(i).sendMessage(ChatColor.GOLD + "You just received " + amount + " gold coins for this event!");
+				}
+			}
+		}
 	}
 	
 	public void playerExpChange(PlayerExpChangeEvent event) {
@@ -44,6 +59,10 @@ public class EventDoubleExp extends MeepEvent {
 		} else {
 			expGain.put(event.getPlayer(), expGain.get(event.getPlayer()) + event.getAmount());
 		}
+	}
+	
+	public void playerJoin(PlayerJoinEvent event) {
+		event.getPlayer().sendMessage(ChatColor.GOLD + "It is currently Double Experience Hour!");
 	}
 
 	@Override

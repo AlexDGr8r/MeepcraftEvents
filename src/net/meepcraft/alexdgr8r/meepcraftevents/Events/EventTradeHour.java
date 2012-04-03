@@ -1,6 +1,9 @@
-package net.meepcraft.alexdgr8r.meepcraftevents;
+package net.meepcraft.alexdgr8r.meepcraftevents.Events;
 
 import java.util.Random;
+
+import net.meepcraft.alexdgr8r.meepcraftevents.EnumMeepEvent;
+import net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -10,7 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EventTradeHour extends MeepEvent {
 	
@@ -22,9 +25,10 @@ public class EventTradeHour extends MeepEvent {
 	private int updateTicks = 0;
 
 	@Override
-	public void start(MeepcraftEvents plugin) {
+	public boolean start(MeepcraftEvents plugin) {
 		isTradeHour = true;
 		plugin.getServer().broadcast(Message, "meep.tradehour");
+		return true;
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public class EventTradeHour extends MeepEvent {
 		plugin.getServer().broadcast(endMessage, "meep.tradehour");
 	}
 	
-	public void playerLogin(PlayerLoginEvent event) {
+	public void playerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		if (player.hasPermission("meep.tradehour")) {
 			player.sendMessage(Message);
