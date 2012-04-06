@@ -14,31 +14,40 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.sleelin.pvptoggle.PvPToggle;
 
 public class MeepcraftEvents extends JavaPlugin {
 	
 	private static EnumMeepEvent currentEvent;
 	private static EnumMeepEvent lastEvent;
+	private static Logger log;
 	private int waitingTaskID = -1;
 	private int runningTaskID = -1;
 	
 	public Random rand = new Random();
 	public HashMap<Integer, Integer> EventRarity = new HashMap<Integer, Integer>();
 	
-	public static Logger log;
 	public static FileConfiguration config;
 	public static Economy economy = null;
+	public static PvPToggle pvp = null;
 
 	public void onEnable() {
 		log = this.getLogger();
 		configurationSetup();
 		LoadConfigValues();
 		if (setupEcon()) {
-			log.info("[MeepcraftEvents] Hooked to " + economy.getName() + "!");
+			serverLog("Hooked to " + economy.getName() + " for economy handling!");
 		} else {
-			log.info("[MeepcraftEvents] Did not link with an economy plugin!");
+			serverLog("Did not link with an economy plugin!");
+		}
+		if (setupPvP()) {
+			serverLog("Hooked to " + pvp.getName() + " for PvP!");
+		} else {
+			serverLog("Did not link with PvPToggle!");
 		}
 		currentEvent = EnumMeepEvent.NONE;
 		lastEvent = EnumMeepEvent.NONE;
@@ -51,7 +60,11 @@ public class MeepcraftEvents extends JavaPlugin {
 				}
 			}
 		}, 300L, 300L);
-		log.info("MeepcraftEvents plugin enabled!");
+		serverLog("Enabled Successfully!");
+	}
+	
+	public static void serverLog(String s) {
+		log.info("[MeepcraftEvents] " + s);
 	}
 	
 	private long getRandomDelay() {
@@ -73,7 +86,7 @@ public class MeepcraftEvents extends JavaPlugin {
 	public void onDisable() {
 		this.getServer().getScheduler().cancelTasks(this);
 		this.saveConfig();
-		log.info("MeepcraftEvents plugin disabled!");
+		serverLog("Plugin disabled!");
 	}
 	
 	private void configurationSetup() {
@@ -111,16 +124,24 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	private boolean setupEcon() {
 		if (this.getServer().getPluginManager().getPlugin("Vault") == null) {
-			log.info("[MeepcraftEvents] Did not link with Vault plugin!");
+			serverLog("Did not link with Vault plugin!");
 			return false;
 		}
 		RegisteredServiceProvider<Economy> economyProvider = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 		if (economyProvider == null) {
-			log.info("[MeepcraftEvents] Did not link with an economy plugin!");
+			serverLog("Did not link with an economy plugin!");
 			return false;
 		}
 		economy = economyProvider.getProvider();
 		return economy != null;
+	}
+	
+	private boolean setupPvP() {
+		Plugin PvPTogglePlugin = this.getServer().getPluginManager().getPlugin("PvPToggle");
+		if (PvPTogglePlugin != null){
+			pvp = ((PvPToggle) PvPTogglePlugin).getHandler();
+		}
+		return pvp != null;
 	}
 	
 	public void startNewEvent() {

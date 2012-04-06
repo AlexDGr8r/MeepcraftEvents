@@ -11,7 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
 public abstract class MeepEvent implements Comparable<MeepEvent> {
 	
@@ -54,6 +56,12 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 	
 	/** Called when MeepEvent is current event and when a player is about to receive experience normally. PRIORITY=NORMAL */
 	public void playerExpChange(PlayerExpChangeEvent event) {}
+	
+	/** Called when MeepEvent is current event and when a player is about to level up normally. PRIORITY=NORMAL */
+	public void playerLevelChange(PlayerLevelChangeEvent event) {}
+	
+	/** Called when MeepEvent is current event and when a command has been performed. PRIORITY=NORMAL */
+	public void serverCommand(ServerCommandEvent event) {}
 
 	public final int compareTo(MeepEvent o) {
 		return this.rarity - o.rarity;

@@ -24,17 +24,23 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EventMobAttack extends MeepEvent {
 	
 	public int ticksTillStart = 2;
+	public boolean doubleExp = false;
 	public HashMap<Player, Integer> mobKills = new HashMap<Player, Integer>();
 	
 	public boolean start(MeepcraftEvents plugin) {
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! Her army is arriving!!!");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "They will try and kill each one of you, one by one.");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Kill as many as you can!");
+		if (plugin.rand.nextInt(4) == 0) {
+			doubleExp = true;
+			plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will also receive double experience during this event.");
+		}
 		for (World world : plugin.getServer().getWorlds()) {
 			world.setTime(18000);
 			if (world.getEnvironment() == Environment.NORMAL) {
@@ -98,6 +104,15 @@ public class EventMobAttack extends MeepEvent {
 	
 	public void playerJoin(PlayerJoinEvent event) {
 		event.getPlayer().sendMessage(ChatColor.RED + "SHE's army is attacking! Prepare quickly for battle!");
+		if (doubleExp) {
+			event.getPlayer().sendMessage(ChatColor.GOLD + "You will also receive double experience during battle.");
+		}
+	}
+	
+	public void playerExpChange(PlayerExpChangeEvent event) {
+		if (doubleExp) {
+			event.setAmount(event.getAmount() * 2);
+		}
 	}
 
 	@Override
@@ -135,7 +150,7 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 			if (tries <= 10) {
-				MeepcraftEvents.log.info("[MeepcraftEvents] Mob spawned around " + player.getName() + " " + randLoc.distance(loc) + " blocks away.");
+				MeepcraftEvents.serverLog("Mob spawned around " + player.getName() + " " + randLoc.distance(loc) + " blocks away.");
 				monstersAround++;
 			}
 			if (++spawnTries >= 5) {

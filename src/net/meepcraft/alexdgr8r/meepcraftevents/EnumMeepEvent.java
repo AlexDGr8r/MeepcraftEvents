@@ -5,9 +5,10 @@ import net.meepcraft.alexdgr8r.meepcraftevents.Events.*;
 public enum EnumMeepEvent {
 	
 	NONE(0, "none", -1, null),
-	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
-	MOB_ATTACK(2, "mobattack", 5, new EventMobAttack()),
-	DOUBLE_EXP(3, "doubleexp", 15, new EventDoubleExp());
+//	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
+	MOB_ATTACK(1, "mobattack", 5, new EventMobAttack()),
+	DOUBLE_EXP(2, "doubleexp", 15, new EventDoubleExp()),
+	FORCED_PVP(3, "forcedpvp", 25, new EventForcedPvP());
 	
 	private int ID;
 	private String Name;
@@ -47,7 +48,7 @@ public enum EnumMeepEvent {
 				return event;
 			}
 		}
-		MeepcraftEvents.log.info("[MeepcraftEvents] Was not able to get event based off given ID.");
+		MeepcraftEvents.serverLog("Was not able to get event based off given ID.");
 		return NONE;
 	}
 

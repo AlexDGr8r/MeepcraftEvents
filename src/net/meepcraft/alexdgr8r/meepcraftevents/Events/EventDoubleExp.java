@@ -15,10 +15,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 
 public class EventDoubleExp extends MeepEvent {
 	
 	public HashMap<Player, Integer> expGain = new HashMap<Player, Integer>();
+	public HashMap<Player, Integer> levelGain = new HashMap<Player, Integer>();
 	
 	public boolean start(MeepcraftEvents plugin) {
 		plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will now receive Double Experience for the next hour!");
@@ -39,11 +41,12 @@ public class EventDoubleExp extends MeepEvent {
 			}
 		});
 		for (int i = 0; i < (players.size() < 5 ? players.size() : 5); i++) {
-			plugin.getServer().broadcastMessage(ChatColor.GOLD + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.GOLD + " - Exp. Gained: " + expGain.get(players.get(i)));
+			plugin.getServer().broadcastMessage(ChatColor.GOLD + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.GOLD + " - Exp. Gained: " + expGain.get(players.get(i))
+					+ " - Lvls: " + levelGain.get(players.get(i)));
 		}
 		if (MeepcraftEvents.economy != null) {
 			for (int i = 0; i < players.size(); i++) {
-				int amount = 3 * expGain.get(players.get(i));
+				int amount = 2 * expGain.get(players.get(i));
 				MeepcraftEvents.economy.depositPlayer(players.get(i).getName(), amount);
 				if (players.get(i).isOnline()) {
 					players.get(i).sendMessage(ChatColor.GOLD + "You just received " + amount + " gold coins for this event!");
@@ -58,6 +61,14 @@ public class EventDoubleExp extends MeepEvent {
 			expGain.put(event.getPlayer(), event.getAmount());
 		} else {
 			expGain.put(event.getPlayer(), expGain.get(event.getPlayer()) + event.getAmount());
+		}
+	}
+	
+	public void playerLevelChange(PlayerLevelChangeEvent event) {
+		if (!levelGain.containsKey(event.getPlayer())) {
+			levelGain.put(event.getPlayer(), 1);
+		} else {
+			levelGain.put(event.getPlayer(), levelGain.get(event.getPlayer()) + 1);
 		}
 	}
 	

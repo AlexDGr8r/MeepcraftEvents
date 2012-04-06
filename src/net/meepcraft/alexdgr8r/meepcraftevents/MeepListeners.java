@@ -6,7 +6,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
 public class MeepListeners implements Listener {
 
@@ -39,6 +41,22 @@ public class MeepListeners implements Listener {
 		EnumMeepEvent mEvent = MeepcraftEvents.getCurrentEvent();
 		if (mEvent != EnumMeepEvent.NONE) {
 			mEvent.getMeepEvent().playerExpChange(event);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onLevelChange(PlayerLevelChangeEvent event) {
+		EnumMeepEvent mEvent = MeepcraftEvents.getCurrentEvent();
+		if (mEvent != EnumMeepEvent.NONE) {
+			mEvent.getMeepEvent().playerLevelChange(event);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onServerCommand(ServerCommandEvent event) {
+		EnumMeepEvent mEvent = MeepcraftEvents.getCurrentEvent();
+		if (mEvent != EnumMeepEvent.NONE) {
+			mEvent.getMeepEvent().serverCommand(event);
 		}
 	}
 	

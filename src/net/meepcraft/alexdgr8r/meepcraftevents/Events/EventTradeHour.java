@@ -93,7 +93,7 @@ public class EventTradeHour extends MeepEvent {
 
 	@Override
 	public EnumMeepEvent getEnum() {
-		return EnumMeepEvent.TRADE_HOUR;
+		return EnumMeepEvent.NONE;
 	}
 	
 	@Override

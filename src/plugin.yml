@@ -3,8 +3,8 @@ main: net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents
 description: Gives Meepcraft some cool random events and stuff
 author: AlexDGr8r
 website: http://meepcraft.net/
-version: 1.0
-softdepend: [Vault]
+version: 1.1
+softdepend: [Vault, PvPToggle]
 commands:
     startevent:
         description: Start an event
