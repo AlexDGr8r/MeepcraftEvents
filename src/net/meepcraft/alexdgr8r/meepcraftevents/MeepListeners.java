@@ -12,7 +12,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 
 public class MeepListeners implements Listener {
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		EnumMeepEvent mEvent = MeepcraftEvents.getCurrentEvent();
 		if (mEvent != EnumMeepEvent.NONE) {

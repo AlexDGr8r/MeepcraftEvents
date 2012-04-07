@@ -7,8 +7,8 @@ public enum EnumMeepEvent {
 	NONE(0, "none", -1, null),
 //	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
 	MOB_ATTACK(1, "mobattack", 5, new EventMobAttack()),
-	DOUBLE_EXP(2, "doubleexp", 15, new EventDoubleExp()),
-	FORCED_PVP(3, "forcedpvp", 25, new EventForcedPvP());
+	DOUBLE_EXP(2, "doubleexp", 15, new EventDoubleExp());
+//	FORCED_PVP(3, "forcedpvp", 25, new EventForcedPvP());
 	
 	private int ID;
 	private String Name;

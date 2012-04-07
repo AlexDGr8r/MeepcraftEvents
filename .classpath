@@ -2,12 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="C:/Users/Alexander D Greater/Desktop/bukkit-1.2.5-R0.1-20120402.212540-4.jar">
+	<classpathentry kind="lib" path="C:/Users/Alexander D Greater/Desktop/Old Desktop/bukkit-1.2.5-R0.1-20120402.212540-4.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Alexander D Greater/Desktop/Vault.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Alexander D Greater/Desktop/PvPToggle.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Alexander D Greater/Desktop/Old Desktop/Vault.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

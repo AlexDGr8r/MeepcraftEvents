@@ -14,11 +14,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.sleelin.pvptoggle.PvPToggle;
 
 public class MeepcraftEvents extends JavaPlugin {
 	
@@ -33,7 +30,6 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	public static FileConfiguration config;
 	public static Economy economy = null;
-	public static PvPToggle pvp = null;
 
 	public void onEnable() {
 		log = this.getLogger();
@@ -43,11 +39,6 @@ public class MeepcraftEvents extends JavaPlugin {
 			serverLog("Hooked to " + economy.getName() + " for economy handling!");
 		} else {
 			serverLog("Did not link with an economy plugin!");
-		}
-		if (setupPvP()) {
-			serverLog("Hooked to " + pvp.getName() + " for PvP!");
-		} else {
-			serverLog("Did not link with PvPToggle!");
 		}
 		currentEvent = EnumMeepEvent.NONE;
 		lastEvent = EnumMeepEvent.NONE;
@@ -68,7 +59,7 @@ public class MeepcraftEvents extends JavaPlugin {
 	}
 	
 	private long getRandomDelay() {
-		return (long)((rand.nextInt(120) + 30) * 60 * 20);
+		return (long)((rand.nextInt(40) + 30) * 60 * 20);
 	}
 	
 	private void scheduleRandomDelayForEventStart() {
@@ -134,14 +125,6 @@ public class MeepcraftEvents extends JavaPlugin {
 		}
 		economy = economyProvider.getProvider();
 		return economy != null;
-	}
-	
-	private boolean setupPvP() {
-		Plugin PvPTogglePlugin = this.getServer().getPluginManager().getPlugin("PvPToggle");
-		if (PvPTogglePlugin != null){
-			pvp = ((PvPToggle) PvPTogglePlugin).getHandler();
-		}
-		return pvp != null;
 	}
 	
 	public void startNewEvent() {

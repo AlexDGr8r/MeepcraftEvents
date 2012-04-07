@@ -26,7 +26,7 @@ public class EventForcedPvP extends MeepEvent {
 	public HashMap<Player, Integer> playerKills = new HashMap<Player, Integer>();
 	
 	public boolean start(MeepcraftEvents plugin) {
-		if (MeepcraftEvents.pvp == null) return false;
+//		if (MeepcraftEvents.pvp == null) return false;
 		
 		plugin.getServer().broadcastMessage(ChatColor.RED + "It is now time for Forced PvP throughout all worlds!");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "War enabled in Towny world!");
@@ -41,7 +41,7 @@ public class EventForcedPvP extends MeepEvent {
 	}
 	
 	public void end(MeepcraftEvents plugin) {
-		if (MeepcraftEvents.pvp == null) return;
+//		if (MeepcraftEvents.pvp == null) return;
 		
 		setAllPvP(plugin, false);
 		plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "townyadmin toggle war");
@@ -88,7 +88,7 @@ public class EventForcedPvP extends MeepEvent {
 
 	@Override
 	public EnumMeepEvent getEnum() {
-		return EnumMeepEvent.FORCED_PVP;
+		return EnumMeepEvent.NONE;
 	}
 
 	@Override
@@ -97,11 +97,11 @@ public class EventForcedPvP extends MeepEvent {
 	}
 	
 	public void setAllPvP(MeepcraftEvents plugin, boolean flag) {
-		for (Player player : plugin.getServer().getOnlinePlayers()) {
-			if (MeepcraftEvents.pvp.checkPlayerStatus(player, player.getWorld().getName()) != flag) {
-				MeepcraftEvents.pvp.setPlayerStatus(player, player.getWorld().getName(), flag);
-			}
-		}
+//		for (Player player : plugin.getServer().getOnlinePlayers()) {
+//			if (MeepcraftEvents.pvp.checkPlayerStatus(player, player.getWorld().getName()) != flag) {
+//				MeepcraftEvents.pvp.setPlayerStatus(player, player.getWorld().getName(), flag);
+//			}
+//		}
 	}
 	
 	public void entityDeath(EntityDeathEvent event) {
