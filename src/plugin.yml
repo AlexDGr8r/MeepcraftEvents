@@ -4,7 +4,7 @@ description: Gives Meepcraft some cool random events and stuff
 author: AlexDGr8r
 website: http://meepcraft.net/
 version: 1.1
-softdepend: [Vault, PvPToggle]
+softdepend: [Vault]
 commands:
     startevent:
         description: Start an event
@@ -26,12 +26,18 @@ commands:
         usage: /settrade
         permission: meep.settrade
         permission-message: You don't have permission to do this.
+    pray:
+        description: Pray for safety from She!
+        usage: /pray
+        permission: meep.pray
+        permission-message: You don't have permission to do this.
 permissions:
     meep.standard:
         description: Standard permissions for players
         default: true
         children:
             meep.tradehour: true
+            meep.pray: true
     meep.admin:
         description: Admin permissions set
         default: op
@@ -42,6 +48,9 @@ permissions:
             meep.avoidmob: true
     meep.tradehour:
         description: Allows to use tradehour command during Trade Hour
+        default: true
+    meep.pray:
+        description: Allows player to pray to Notch for safety from She
         default: true
     meep.settrade:
         description: Allows to set tradehour location

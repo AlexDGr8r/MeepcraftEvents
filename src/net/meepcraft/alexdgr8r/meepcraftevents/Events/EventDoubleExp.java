@@ -46,7 +46,7 @@ public class EventDoubleExp extends MeepEvent {
 		}
 		if (MeepcraftEvents.economy != null) {
 			for (int i = 0; i < players.size(); i++) {
-				int amount = 2 * expGain.get(players.get(i));
+				int amount = 3 * expGain.get(players.get(i));
 				MeepcraftEvents.economy.depositPlayer(players.get(i).getName(), amount);
 				if (players.get(i).isOnline()) {
 					players.get(i).sendMessage(ChatColor.GOLD + "You just received " + amount + " gold coins for this event!");

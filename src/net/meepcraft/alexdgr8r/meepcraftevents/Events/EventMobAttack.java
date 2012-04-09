@@ -15,6 +15,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -31,12 +33,16 @@ public class EventMobAttack extends MeepEvent {
 	
 	public int ticksTillStart = 2;
 	public boolean doubleExp = false;
+	public boolean isAttacking = false;
 	public HashMap<Player, Integer> mobKills = new HashMap<Player, Integer>();
+	public List<Player> prayed = new ArrayList<Player>();
 	
 	public boolean start(MeepcraftEvents plugin) {
+		isAttacking = true;
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! Her army is arriving!!!");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "They will try and kill each one of you, one by one.");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Kill as many as you can!");
+		plugin.getServer().broadcastMessage(ChatColor.RED + "For you scared ones that don't want to fight, you better /pray!");
 		if (plugin.rand.nextInt(4) == 0) {
 			doubleExp = true;
 			plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will also receive double experience during this event.");
@@ -59,7 +65,9 @@ public class EventMobAttack extends MeepEvent {
 		}
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			if (!player.hasPermission("meep.avoidmob")) {
-				spawnMobs(player, plugin);
+				if (!prayed.contains(player)) {
+					spawnMobs(player, plugin);
+				}
 			}
 		}
 		for (World world : plugin.getServer().getWorlds()) {
@@ -67,9 +75,40 @@ public class EventMobAttack extends MeepEvent {
 				world.setTime(18000);
 			}
 		}
+		if (plugin.rand.nextInt(4) == 0) {
+			plugin.getServer().broadcastMessage(ChatColor.DARK_RED + "[TYRANT] She" + ChatColor.WHITE + ": " + randomMessage(plugin.rand));
+		}
+	}
+	
+	public String randomMessage(Random random) {
+		int i = random.nextInt(10);
+		switch (i) {
+		case 0:
+			return "Having fun? Muhahaha!!!!";
+		case 1:
+			return "My army is hungry for your blood...";
+		case 2:
+			return "Don't worry, I have more soldiers where those came from.";
+		case 3:
+			return "Fight my minions!!!!";
+		case 4:
+			return "Not even the doctor could save you now...";
+		case 5:
+			return "Advance!!!";
+		case 6:
+			return "Breach through the West Gates!!!!";
+		case 7:
+			return "Blades getting dull yet? Muhaha!";
+		case 8:
+			return "I'm not impressed...FIGHT HARDER MY ARMY!!!";
+		case 9:
+			return "No, this isn't Meepcraft. This is SheCraft!!! >)";
+		}
+		return "Having fun? Muhahaha!!!!";
 	}
 	
 	public void end(MeepcraftEvents plugin) {
+		isAttacking = false;
 		plugin.getServer().broadcastMessage(ChatColor.AQUA + "The battle is over! She is retreating!");
 		plugin.getServer().broadcastMessage(ChatColor.AQUA + "I'm sure she'll be back. For now, rest and rebuild.");
 		plugin.getServer().broadcastMessage(ChatColor.AQUA + "======Best Soldiers======");
@@ -104,6 +143,7 @@ public class EventMobAttack extends MeepEvent {
 	
 	public void playerJoin(PlayerJoinEvent event) {
 		event.getPlayer().sendMessage(ChatColor.RED + "SHE's army is attacking! Prepare quickly for battle!");
+		event.getPlayer().sendMessage(ChatColor.RED + "If you don't want to fight, go /pray");
 		if (doubleExp) {
 			event.getPlayer().sendMessage(ChatColor.GOLD + "You will also receive double experience during battle.");
 		}
@@ -242,6 +282,29 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 		}
+	}
+	
+	public String[] getCommandNames() {
+		return new String[] {"pray"};
+	}
+	
+	public boolean handleCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		Player player = null;
+		if (sender instanceof Player) player = (Player)sender;
+		if (cmd.getName().equalsIgnoreCase("pray") && player != null) {
+			if (!isAttacking) {
+				player.sendMessage(ChatColor.GREEN + "There is no sight of She's army currently.");
+				return true;
+			}
+			if (prayed.contains(player)) {
+				player.sendMessage(ChatColor.GREEN + "You have already prayed to Notch for protection from She's army.");
+			} else {
+				prayed.add(player);
+				player.sendMessage(ChatColor.GREEN + "The power of Notch will protect you from the onslaught of She's army.");
+			}
+			return true;
+		}
+		return false;
 	}
 
 }
