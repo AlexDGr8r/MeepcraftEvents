@@ -30,6 +30,7 @@ public class MeepcraftEvents extends JavaPlugin {
 	
 	public static FileConfiguration config;
 	public static Economy economy = null;
+	public static boolean queueSaveConfig = false;
 
 	public void onEnable() {
 		log = this.getLogger();
@@ -42,10 +43,11 @@ public class MeepcraftEvents extends JavaPlugin {
 		}
 		currentEvent = EnumMeepEvent.NONE;
 		lastEvent = EnumMeepEvent.NONE;
-		this.getServer().getPluginManager().registerEvents(new MeepListeners(), this);
+		this.getServer().getPluginManager().registerEvents(new MeepListeners(this), this);
 		scheduleRandomDelayForEventStart();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
+				if (queueSaveConfig) updateConfig();
 				if (currentEvent != EnumMeepEvent.NONE) {
 					updateCurrentEvent();
 				}
@@ -165,6 +167,11 @@ public class MeepcraftEvents extends JavaPlugin {
 		if (event != null) {
 			event.update(this);
 		}
+	}
+	
+	public void updateConfig() {
+		this.saveConfig();
+		queueSaveConfig = false;
 	}
 	
 	public void endCurrentEvent() {

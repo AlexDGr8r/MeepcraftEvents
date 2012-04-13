@@ -3,7 +3,7 @@ main: net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents
 description: Gives Meepcraft some cool random events and stuff
 author: AlexDGr8r
 website: http://meepcraft.net/
-version: 1.1
+version: 1.2
 softdepend: [Vault]
 commands:
     startevent:
@@ -26,10 +26,15 @@ commands:
         usage: /settrade
         permission: meep.settrade
         permission-message: You don't have permission to do this.
-    pray:
-        description: Pray for safety from She!
-        usage: /pray
-        permission: meep.pray
+    fight:
+        description: Go help defend the west gates!
+        usage: /fight
+        permission: meep.fight
+        permission-message: You don't have permission to do this.
+    setwestgates:
+        description: Set the location of the west gates for Mob attack
+        usage: /setwestgates
+        permission: meep.setgates
         permission-message: You don't have permission to do this.
 permissions:
     meep.standard:
@@ -37,7 +42,7 @@ permissions:
         default: true
         children:
             meep.tradehour: true
-            meep.pray: true
+            meep.fight: true
     meep.admin:
         description: Admin permissions set
         default: op
@@ -46,12 +51,16 @@ permissions:
             meep.startevent: true
             meep.endevent: true
             meep.avoidmob: true
+            meep.setgates: true
     meep.tradehour:
         description: Allows to use tradehour command during Trade Hour
         default: true
-    meep.pray:
-        description: Allows player to pray to Notch for safety from She
+    meep.fight:
+        description: Allows player to teleport to the west gates for battle
         default: true
+    meep.setgates:
+        description: Allow player to set teleport location for the west gates
+        default: op
     meep.settrade:
         description: Allows to set tradehour location
         default: op

@@ -137,6 +137,7 @@ public class EventTradeHour extends MeepEvent {
 			config.set("tradehour.location.world", MarketLocation.getWorld().getName());
 			config.set("tradehour.location.yaw", String.valueOf(MarketLocation.getYaw()));
 			config.set("tradehour.location.pitch", String.valueOf(MarketLocation.getPitch()));
+			MeepcraftEvents.queueSaveConfig = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

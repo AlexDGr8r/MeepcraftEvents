@@ -52,7 +52,7 @@ public abstract class MeepEvent implements Comparable<MeepEvent> {
 	public void playerQuit(PlayerQuitEvent event) {}
 	
 	/** Called when MeepEvent is current event and when an entity dies. PRIORITY=HIGHEST */
-	public void entityDeath(EntityDeathEvent event) {}
+	public void entityDeath(EntityDeathEvent event, MeepcraftEvents plugin) {}
 	
 	/** Called when MeepEvent is current event and when a player is about to receive experience normally. PRIORITY=NORMAL */
 	public void playerExpChange(PlayerExpChangeEvent event) {}

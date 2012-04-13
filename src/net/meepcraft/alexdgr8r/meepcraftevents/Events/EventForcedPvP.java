@@ -104,7 +104,7 @@ public class EventForcedPvP extends MeepEvent {
 //		}
 	}
 	
-	public void entityDeath(EntityDeathEvent event) {
+	public void entityDeath(EntityDeathEvent event, MeepcraftEvents plugin) {
 		if(!(event.getEntity() instanceof LivingEntity)) return;
 		
 		LivingEntity victim = (LivingEntity)event.getEntity();

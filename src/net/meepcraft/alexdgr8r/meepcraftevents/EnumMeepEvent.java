@@ -5,9 +5,12 @@ import net.meepcraft.alexdgr8r.meepcraftevents.Events.*;
 public enum EnumMeepEvent {
 	
 	NONE(0, "none", -1, null),
+	MOB_ATTACK(1, "mobattack", 40, new EventMobAttack()),
+	DOUBLE_EXP(2, "doubleexp", 45, new EventDoubleExp()),
+	TOWNY_WAR(3, "townywar", 35, new EventTownyWar());
+	
+//  Unused:
 //	TRADE_HOUR(1, "tradehour", 20, new EventTradeHour()),
-	MOB_ATTACK(1, "mobattack", 5, new EventMobAttack()),
-	DOUBLE_EXP(2, "doubleexp", 15, new EventDoubleExp());
 //	FORCED_PVP(3, "forcedpvp", 25, new EventForcedPvP());
 	
 	private int ID;

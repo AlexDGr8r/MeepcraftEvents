@@ -12,6 +12,7 @@ import net.meepcraft.alexdgr8r.meepcraftevents.EnumMeepEvent;
 import net.meepcraft.alexdgr8r.meepcraftevents.MeepcraftEvents;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -56,6 +57,10 @@ public class EventDoubleExp extends MeepEvent {
 	}
 	
 	public void playerExpChange(PlayerExpChangeEvent event) {
+		if (event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+			event.getPlayer().sendMessage(ChatColor.RED + "Double Experience doesn't work in creative!");
+			return;
+		}
 		event.setAmount(event.getAmount() * 2);
 		if (!expGain.containsKey(event.getPlayer())) {
 			expGain.put(event.getPlayer(), event.getAmount());
@@ -65,6 +70,7 @@ public class EventDoubleExp extends MeepEvent {
 	}
 	
 	public void playerLevelChange(PlayerLevelChangeEvent event) {
+		if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 		if (!levelGain.containsKey(event.getPlayer())) {
 			levelGain.put(event.getPlayer(), 1);
 		} else {

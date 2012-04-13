@@ -17,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -32,26 +33,29 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class EventMobAttack extends MeepEvent {
 	
 	public int ticksTillStart = 2;
+	public int ticksForIntensity = 0;
+	public int totalMobKills = 0;
 	public boolean doubleExp = false;
 	public boolean isAttacking = false;
+	public Location westGates;
 	public HashMap<Player, Integer> mobKills = new HashMap<Player, Integer>();
-	public List<Player> prayed = new ArrayList<Player>();
+	public List<String> cheesyLines = new ArrayList<String>();
 	
 	public boolean start(MeepcraftEvents plugin) {
 		isAttacking = true;
+		createCheesyLines();
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Take up arms! Her army is arriving!!!");
-		plugin.getServer().broadcastMessage(ChatColor.RED + "They will try and kill each one of you, one by one.");
+		plugin.getServer().broadcastMessage(ChatColor.RED + "They will try and take over the spawn castle by breaching through the west gates!");
 		plugin.getServer().broadcastMessage(ChatColor.RED + "Kill as many as you can!");
-		plugin.getServer().broadcastMessage(ChatColor.RED + "For you scared ones that don't want to fight, you better /pray!");
+		plugin.getServer().broadcastMessage(ChatColor.RED + "If you wish to defend the west gates, use /fight");
 		if (plugin.rand.nextInt(4) == 0) {
 			doubleExp = true;
 			plugin.getServer().broadcastMessage(ChatColor.GOLD + "You will also receive double experience during this event.");
 		}
-		for (World world : plugin.getServer().getWorlds()) {
+		World world = plugin.getServer().getWorld("spawnhub");
+		if (world != null) {
 			world.setTime(18000);
-			if (world.getEnvironment() == Environment.NORMAL) {
-				world.setStorm(true);
-			}
+			world.setStorm(true);
 		}
 		return true;
 	}
@@ -59,52 +63,43 @@ public class EventMobAttack extends MeepEvent {
 	public void update(MeepcraftEvents plugin) {
 		if (--ticksTillStart > 0) {
 			return;
+		} else if (++ticksForIntensity % 4 == 0) {
+			plugin.getServer().broadcastMessage(ChatColor.RED + "The West Gates are still under attack!");
+			plugin.getServer().broadcastMessage(ChatColor.RED + "Come join the battle by using /fight");
 		}
 		if (ticksTillStart == 0) {
 			plugin.getServer().broadcastMessage(ChatColor.RED + "HERE THEY COME!!!");
 		}
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			if (!player.hasPermission("meep.avoidmob")) {
-				if (!prayed.contains(player)) {
-					spawnMobs(player, plugin);
-				}
+				spawnMobs(player, plugin);
 			}
 		}
-		for (World world : plugin.getServer().getWorlds()) {
+		World world = plugin.getServer().getWorld("spawnhub");
+		if (world != null) {
 			if (world.getTime() <= 16000 || world.getTime() >= 22000) {
 				world.setTime(18000);
 			}
 		}
 		if (plugin.rand.nextInt(4) == 0) {
-			plugin.getServer().broadcastMessage(ChatColor.DARK_RED + "[TYRANT] She" + ChatColor.WHITE + ": " + randomMessage(plugin.rand));
+			plugin.getServer().broadcastMessage(ChatColor.DARK_RED + "[TYRANT] She" + ChatColor.WHITE + ": " + cheesyLines.get(plugin.rand.nextInt(cheesyLines.size())));
 		}
 	}
 	
-	public String randomMessage(Random random) {
-		int i = random.nextInt(10);
-		switch (i) {
-		case 0:
-			return "Having fun? Muhahaha!!!!";
-		case 1:
-			return "My army is hungry for your blood...";
-		case 2:
-			return "Don't worry, I have more soldiers where those came from.";
-		case 3:
-			return "Fight my minions!!!!";
-		case 4:
-			return "Not even the doctor could save you now...";
-		case 5:
-			return "Advance!!!";
-		case 6:
-			return "Breach through the West Gates!!!!";
-		case 7:
-			return "Blades getting dull yet? Muhaha!";
-		case 8:
-			return "I'm not impressed...FIGHT HARDER MY ARMY!!!";
-		case 9:
-			return "No, this isn't Meepcraft. This is SheCraft!!! >)";
-		}
-		return "Having fun? Muhahaha!!!!";
+	public void createCheesyLines() {
+		cheesyLines.add("Having fun? Muhahaha!!!!");
+		cheesyLines.add("My army is hungry for your blood...");
+		cheesyLines.add("Don't worry, I have more soldiers where those came from.");
+		cheesyLines.add("Fight my minions!!!!");
+		cheesyLines.add("Not even the doctor could save you now...");
+		cheesyLines.add("Advance!!!");
+		cheesyLines.add("Breach through the West Gates!!!!");
+		cheesyLines.add("Blades getting dull yet? Muhaha!");
+		cheesyLines.add("I'm not impressed...FIGHT HARDER MY ARMY!!!");
+		cheesyLines.add("No, this isn't Meepcraft. This is SheCraft!!! >)");
+		cheesyLines.add("Mmmm, I taste blood!");
+		cheesyLines.add("Wow, Meepcraft players really suck!");
+		cheesyLines.add("Not much further my minions!!!");
 	}
 	
 	public void end(MeepcraftEvents plugin) {
@@ -124,6 +119,7 @@ public class EventMobAttack extends MeepEvent {
 		for (int i = 0; i < (players.size() < 5 ? players.size() : 5); i++) {
 			plugin.getServer().broadcastMessage(ChatColor.AQUA + "" + (i + 1) + ". " + players.get(i).getDisplayName() + ChatColor.AQUA + " - Kills: " + mobKills.get(players.get(i)));
 		}
+		plugin.getServer().broadcastMessage(ChatColor.AQUA + "Overall we slaughtered " + totalMobKills + " of them! Good job!");
 		if (MeepcraftEvents.economy != null) {
 			for (int i = 0; i < players.size(); i++) {
 				int amount = 8 * mobKills.get(players.get(i));
@@ -133,24 +129,23 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 		}
-		for (World world : plugin.getServer().getWorlds()) {
+		World world = plugin.getServer().getWorld("spawnhub");
+		if (world != null) {
+			world.setStorm(false);
 			world.setTime(0);
-			if (world.getEnvironment() == Environment.NORMAL) {
-				world.setStorm(false);
-			}
 		}
 	}
 	
 	public void playerJoin(PlayerJoinEvent event) {
-		event.getPlayer().sendMessage(ChatColor.RED + "SHE's army is attacking! Prepare quickly for battle!");
-		event.getPlayer().sendMessage(ChatColor.RED + "If you don't want to fight, go /pray");
+		event.getPlayer().sendMessage(ChatColor.RED + "SHE's army is attacking!");
+		event.getPlayer().sendMessage(ChatColor.RED + "If you want to join the battle, use /fight");
 		if (doubleExp) {
 			event.getPlayer().sendMessage(ChatColor.GOLD + "You will also receive double experience during battle.");
 		}
 	}
 	
 	public void playerExpChange(PlayerExpChangeEvent event) {
-		if (doubleExp) {
+		if (doubleExp && event.getPlayer().getWorld().getName().equalsIgnoreCase("spawnhub")) {
 			event.setAmount(event.getAmount() * 2);
 		}
 	}
@@ -167,11 +162,12 @@ public class EventMobAttack extends MeepEvent {
 
 	@Override
 	public long getLengthOfEvent(Random random) {
-		return random.nextInt(26) + 5;
+		return random.nextInt(16) + 5;
 	}
 	
 	public void spawnMobs(Player player, MeepcraftEvents plugin) {
 		Location loc = player.getLocation();
+		if (loc.getWorld() != plugin.getServer().getWorld("spawnhub")) return;
 		List<Entity> entitiesAround = player.getNearbyEntities(30, 30, 30);
 		int monstersAround = 0;
 		for (int i = 0; i < entitiesAround.size(); i++) {
@@ -180,7 +176,8 @@ public class EventMobAttack extends MeepEvent {
 			}
 		}
 		int spawnTries = 0;
-		while (monstersAround < 15) {
+		int spawnIntensity = (ticksForIntensity / 4) * 5;
+		while (monstersAround < (15 + spawnIntensity)) {
 			Location randLoc = getRandomLocation(loc, plugin.rand);
 			int tries = 0;
 			while (loc.getWorld().spawnCreature(randLoc, getEntityTypeBasedOnEnv(loc.getWorld().getEnvironment(), plugin.rand)) == null) {
@@ -190,10 +187,10 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 			if (tries <= 10) {
-				MeepcraftEvents.serverLog("Mob spawned around " + player.getName() + " " + randLoc.distance(loc) + " blocks away.");
+//				MeepcraftEvents.serverLog("Mob spawned around " + player.getName() + " " + randLoc.distance(loc) + " blocks away.");
 				monstersAround++;
 			}
-			if (++spawnTries >= 5) {
+			if (++spawnTries >= 15) {
 				break;
 			}
 		}
@@ -211,7 +208,7 @@ public class EventMobAttack extends MeepEvent {
 	
 	public EntityType getEntityTypeBasedOnEnv(Environment env, Random random) {
 		if (env == Environment.NORMAL) {
-			int r = random.nextInt(11);
+			int r = random.nextInt(12);
 			switch (r) {
 			case 0:
 			case 1:
@@ -229,6 +226,8 @@ public class EventMobAttack extends MeepEvent {
 				return EntityType.CAVE_SPIDER;
 			case 10:
 				return EntityType.CREEPER;
+			case 11:
+				return EntityType.ENDERMAN;
 			}
 		} else if (env == Environment.NETHER) {
 			int r = random.nextInt(10);
@@ -254,7 +253,7 @@ public class EventMobAttack extends MeepEvent {
 		return EntityType.ZOMBIE;
 	}
 	
-	public void entityDeath(EntityDeathEvent event) {
+	public void entityDeath(EntityDeathEvent event, MeepcraftEvents plugin) {
 		if(!(event.getEntity() instanceof LivingEntity)) return;
 		
 		LivingEntity victim = (LivingEntity)event.getEntity();
@@ -273,11 +272,14 @@ public class EventMobAttack extends MeepEvent {
 				}
 			}
 			if (player != null) {
-				if (!(victim instanceof Player)) {
-					if (!mobKills.containsKey(player)) {
-						mobKills.put(player, 1);
-					} else {
-						mobKills.put(player, mobKills.get(player) + 1);
+				if (player.getWorld() == plugin.getServer().getWorld("spawnhub")) {
+					if (!(victim instanceof Player)) {
+						if (!mobKills.containsKey(player)) {
+							mobKills.put(player, 1);
+						} else {
+							mobKills.put(player, mobKills.get(player) + 1);
+						}
+						totalMobKills++;
 					}
 				}
 			}
@@ -285,26 +287,70 @@ public class EventMobAttack extends MeepEvent {
 	}
 	
 	public String[] getCommandNames() {
-		return new String[] {"pray"};
+		return new String[] {"fight", "setwestgates"};
 	}
 	
 	public boolean handleCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = null;
 		if (sender instanceof Player) player = (Player)sender;
-		if (cmd.getName().equalsIgnoreCase("pray") && player != null) {
-			if (!isAttacking) {
-				player.sendMessage(ChatColor.GREEN + "There is no sight of She's army currently.");
-				return true;
-			}
-			if (prayed.contains(player)) {
-				player.sendMessage(ChatColor.GREEN + "You have already prayed to Notch for protection from She's army.");
+		if (cmd.getName().equalsIgnoreCase("fight") && player != null) {
+			if (isAttacking) {
+				player.teleport(westGates);
+				player.sendMessage(ChatColor.RED + "Fight as hard as you can!");
+			} else if (player.hasPermission("meep.setgates")) {
+				player.teleport(westGates);
 			} else {
-				prayed.add(player);
-				player.sendMessage(ChatColor.GREEN + "The power of Notch will protect you from the onslaught of She's army.");
+				player.sendMessage(ChatColor.GREEN + "There is no sight of She's army currently.");
 			}
+			return true;
+		} else if (cmd.getName().equalsIgnoreCase("setwestgates") && player != null) {
+			westGates = player.getLocation();
+			saveWestGatesLocation(MeepcraftEvents.config);
+			player.sendMessage(ChatColor.DARK_GREEN + "West Gates Location set. You can test using /fight");
 			return true;
 		}
 		return false;
+	}
+	
+	public void setDefaultValuesForEvent(MeepcraftEvents plugin) {
+		for (World world : plugin.getServer().getWorlds()) {
+			if (world != null) {
+				if (world.getName().equalsIgnoreCase("spawnhub")) {
+					Location loc = world.getSpawnLocation();
+					plugin.setDefault("mobattack.westgates.x", loc.getX());
+					plugin.setDefault("mobattack.westgates.y", loc.getY());
+					plugin.setDefault("mobattack.westgates.z", loc.getZ());
+					plugin.setDefault("mobattack.westgates.world", loc.getWorld().getName());
+					plugin.setDefault("mobattack.westgates.yaw", String.valueOf(loc.getYaw()));
+					plugin.setDefault("mobattack.westgates.pitch", String.valueOf(loc.getPitch()));
+					break;
+				}
+			}
+		}
+	}
+	
+	public void loadConfigValues(FileConfiguration config, MeepcraftEvents plugin) {
+		double x = config.getDouble("mobattack.westgates.x");
+		double y = config.getDouble("mobattack.westgates.y");
+		double z = config.getDouble("mobattack.westgates.z");
+		String worldName = config.getString("mobattack.westgates.world");
+		float yaw = Float.parseFloat(config.getString("mobattack.westgates.yaw"));
+		float pitch = Float.parseFloat(config.getString("mobattack.westgates.pitch"));
+		westGates = new Location(plugin.getServer().getWorld(worldName), x, y, z, yaw, pitch);
+	}
+	
+	public void saveWestGatesLocation(FileConfiguration config) {
+		try {
+			config.set("tradehour.location.x", westGates.getX());
+			config.set("tradehour.location.y", westGates.getY());
+			config.set("tradehour.location.z", westGates.getZ());
+			config.set("tradehour.location.world", westGates.getWorld().getName());
+			config.set("tradehour.location.yaw", String.valueOf(westGates.getYaw()));
+			config.set("tradehour.location.pitch", String.valueOf(westGates.getPitch()));
+			MeepcraftEvents.queueSaveConfig = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

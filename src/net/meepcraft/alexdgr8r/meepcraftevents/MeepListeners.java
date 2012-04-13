@@ -11,6 +11,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
 public class MeepListeners implements Listener {
+	
+	public MeepcraftEvents plugin = null;
+	
+	public MeepListeners(MeepcraftEvents instance) {
+		plugin = instance;
+	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
@@ -32,7 +38,7 @@ public class MeepListeners implements Listener {
 	public void onEntityDeath(EntityDeathEvent event) {
 		EnumMeepEvent mEvent = MeepcraftEvents.getCurrentEvent();
 		if (mEvent != EnumMeepEvent.NONE) {
-			mEvent.getMeepEvent().entityDeath(event);
+			mEvent.getMeepEvent().entityDeath(event, plugin);
 		}
 	}
 	
